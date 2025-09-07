@@ -1,3 +1,17 @@
+:root{
+    --primary-gold: #c79b3b;
+    --secondary-gold: #ffd700;
+    --dark-bg: rgba(0, 0, 0, 0.7);
+    --card-border: 2px solid var(--primary-gold);
+    --card-radius: 15px;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --transition: all 0.3s ease
+}
+/*{
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+}*/
 body {
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             color: #ffffff;
@@ -5,7 +19,26 @@ body {
             background-attachment: fixed;
             display: flex;
             flex-direction: column;
+            line-height: 1.6;
         }
+ .container{
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+ }
+ @media (max-width: 1800px){
+    .container{
+        max-width: 1400px;
+        padding: 1.5rem;
+    }
+ }
+ @media (max-width: 1600px){
+    .container{
+        max-width: 1200px;
+        padding: 1.25rem;
+    }
+ }       
     /*navbar*/
    .navbar {
             background-color: rgba(0, 0, 0, 0.8);
@@ -13,21 +46,22 @@ body {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
    }
     .nav_container {
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }   
     .navbar a {
-            color: #c79b3b;
+            color: var(--primary-gold);
             text-decoration: none;
-            font-size: 1.8rem;
+            font-size: clamp(1.5rem, 2.5vw, 1.8rem);
             font-weight: bold;
         }
     .links_nav {
             display: flex;
             list-style: none;
+            gap: 1.5rem;
         }
     .links_nav li {
             margin-left: 2rem;
@@ -36,13 +70,13 @@ body {
             color: #fff;
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s;
+            transition: var(--transition);
             padding: 0.5rem 1rem;
             border-radius: 4px;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 1.2vw, 1.1rem);
         }
     .links_nav a:hover {
-            color: #c79b3b;
+            color: var(--primary-gold);
             background-color: rgba(199, 155, 59, 0.1);
         } 
      .welcome-container {
@@ -113,16 +147,18 @@ body {
         }
         
         .bn-login, .bn-register, .rules-btn {
-            padding: 0.8rem 2rem;
-            border: none;
+            padding: clamp(0.6rem, 1.5vw, 0.9rem) clamp(1.5rem, 3vw, 2rem);
+            border: 2px solid var(--primary-gold);
             border-radius: 50px;
-            font-size: 1.1rem;
+            font-size: clamp(0.9rem, 1.3vw, 1.1rem);
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
             text-decoration: none;
             display: inline-block;
             text-align: center;
+            background-color: transparent;
+            color: var(--primary-gold);
         }
         
         .bn-login {
@@ -131,7 +167,7 @@ body {
             border: 2px solid #c79b3b;
         }
         
-        .bn-login:hover {
+        .bn-login:hover, .bn-register:hover {
              background-color: rgba(199, 155, 59, 0.1);
             transform: translateY(-3px);
             
@@ -141,14 +177,7 @@ body {
             background-color: transparent;
             color: #c79b3b;
             border: 2px solid #c79b3b;
-        }
-        
-        .bn-register:hover {
-            background-color: rgba(199, 155, 59, 0.1);
-            transform: translateY(-3px);
-            
-        }
-        
+        }    
         .rules-btn {
             background-color: transparent;
             color: #c79b3b;
@@ -205,10 +234,7 @@ body {
     margin-right: 0.5rem;
     transform: scale(1.4);
   }
-  .text-center{
-    text-align: center;
-    margin-top: 2rem;
-  }/*Fin de Registro*/
+  .text-center{text-align: center;}/*Fin de Registro*/
 
         .rules-container {
     max-width: 1200px;
@@ -286,8 +312,8 @@ body {
 }
 /*Perfil*/
 header h1{
-    color: #c79b3b;
-    font-size: 2.5rem;
+    color: var(--primary-gold);
+    font-size: clamp(2rem, 4vw, 2.8rem);
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
     border-bottom: 1px solid rgba(199, 155, 59, 0.3);
@@ -410,18 +436,19 @@ h3 {
     font-size: 1.2rem;
 }
 .card {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--dark-bg);
     backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 25px;
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    margin-bottom: 30px;
+    border-radius: var(--card-radius);
+    border: var(--card-border);
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+    transition: var(--transition);
 }
 
 .grid {
     display: grid;
-    gap: 30px;
+    gap: clamp(1.5rem, 2.5vw, 2rem);
 }
 
 .grid-2 {
@@ -429,52 +456,59 @@ h3 {
 }
 
 .grid-3 {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 .metrics-grid{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    gap: clamp(1rem, 2vw, 1.5rem);
     margin: 20px 0;
 }
 .metric-card{
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid #c79b3b;
-    border-radius: 15px;
-    padding: 20px;
+    background: var(--dark-bg);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    padding: clamp(1rem, 2vw, 1.5rem);
     text-align: center;
+    transition: var(--transition);
 }
 .metric-value{
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
     font-weight: bold;
-    color: #ffd700;
-    margin-top: 10px;
+    color: var(--secondary-gold);
+    margin-top: 0.5rem;
 }
 .roulette-section{
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    margin: 30px 0;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    margin: 2.5rem 0;
 }
 .roulette-container, .additional-image-container{
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid #c79b3b;
-    border-radius: 15px;
-    padding: 25px;
+    background: var(--dark-bg);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    padding: clamp(1.5rem, 2.5vw, 2rem);
     text-align: center;
 }
 .roulette-image{
     width: 100%;
-    max-width: 300px;
+    max-width: min(400px, 30vw);
     height: auto;
     border-radius: 50%;
-    border: 5px solid #c79b3b;
+    border: clamp(3px, 0.5vw, 5px) solid var(--primary-gold);
+}
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
 }
 .table-image{
     width: 100%;
-    max-width: 600px;
+    max-width: min(500px, 35vw);
     height: auto;
-    border: 3px solid #c79b3b;
+    border: clamp(2px, 0.3vw, 3px) solid var(--primary-gold);
     border-radius: 10px;
 }
 .additional-image-placeholder{
@@ -484,29 +518,29 @@ h3 {
     min-height: 300px;
 }
 .last-numbers{
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid #c79b3b;
-    border-radius: 15px;
-    padding: 20px;
+    background: var(--dark-bg);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    padding: clamp(1rem, 2vw, 1.5rem);
     text-align: center;
-    margin: 20px 0;
+    margin: 2rem 0;
 }
 .numbers-grid{
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 15px;
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+    margin-top: 1rem;
     flex-wrap: wrap;
 }
 .bet-number{
-    width: 50px;
-    height: 50px;
+    width: clamp(40px, 5vw, 60px);
+    height: clamp(40px, 5vw, 60px);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
 }
 .bet-number.red {background: #ff4444; color: white;}
 .bet-number.black {background: #333; color: white;}
@@ -514,8 +548,9 @@ h3 {
 .controls-grid{
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
 }
 .game-status {
     text-align: center;
@@ -530,6 +565,16 @@ h3 {
     color: #cad8d7e5;
     border: 2px solid #ffd700;
 }
+
+.roulette-section {
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+    
+.controls-grid {
+    flex-direction: column;
+    align-items: center;
+    }
 /*Transacción*/
 .saldo-container{
  max-width: 600px;

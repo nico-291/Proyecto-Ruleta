@@ -1,0 +1,21 @@
+{
+    "name": "gira-y-apuesta",
+    "version": "1.0.0",
+    "description": "Casino online con ruleta europea",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "dev": "nodemon app.js"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "express-handlebars": "^7.1.2",
+        "mongoose":"8.19.3",
+        "bcryptjs":"3.0.3",
+        "express-session": "1.18.2",
+        "dotenv": "17.2.3"
+    },
+    "devDependencies": {
+        "nodemon": "3.1.10"
+    }
+}

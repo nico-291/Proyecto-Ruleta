@@ -1,6 +1,9 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
+const session = require('express-session');
+const mongoose = require('mongoose');
+require('dotenv').config();
 
 const app = express();
 

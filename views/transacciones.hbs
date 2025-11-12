@@ -1,41 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transacciones</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-     <nav class="navbar">
-        <div class="nav_container">
-            <a href="index.html">Gira y Apuesta</a>
-            <ul class="links_nav">
-                <li><a href="Perfil.html">Perfil</a></li>
-                <li><a href="Transacciones.html">Transacciones</a></li>
-                <li><a href="MesaRuleta.html">Mesa de Ruleta</a></li>
-                <li><a href="index.html">Cerrar Sesión</a></li>
-            </ul>
-        </div>
-    </nav>
+<!-- 
+  Este es /views/transacciones.hbs
+  Ya no necesita <html>, <head>, etc.
+-->
+<div class="container">
     <header>
         <h1>Gestión de Transacciones</h1>
     </header>
     <main class="rules-card">
         <section class="card text-center saldo-container">
             <h2>Saldo Actual</h2>
-            <div class="Saldo">$15.25USD</div>
+            <!-- ¡DATO DINÁMICO! -->
+            <div class="Saldo">${{user.saldo}}</div>
             <p>Saldo Virtual Disponible</p>
         </section>
+
+        <!-- Mensajes de éxito o error -->
+        {{#if error}}
+          <div class="alert error">{{error}}</div>
+        {{/if}}
+        {{#if success}}
+          <div class="alert success">{{success}}</div>
+        {{/if}}
+
         <div class="grid grid-2">
             <section class="card">
                 <h2>Depositar fichas</h2>
                 <p>Añade Fichas Virtuales</p>
-                <form>
+                <!-- ¡FORMULARIO FUNCIONAL! -->
+                <form action="/deposit" method="POST">
                     <div class="grupo-form">
                         <label for="monto-deposito">Cantidad a Depositar</label>
-                        <input type="number" id="monto-deposito" name="monto-deposito" placeholder="Ingresa Cantidad">
+                        <input type="number" id="monto-deposito" name="monto" placeholder="Ingresa Cantidad" required>
                     </div>
+                    <!-- (Por simplicidad, el método de pago es solo visual) -->
                     <div class="grupo-form">
                         <label for="metodo-deposito">Método de Depósito</label>
                         <select name="metodo-deposito" id="metodo-deposito">
@@ -53,29 +50,70 @@
             <section class="card">
                 <h2>Retirar Fichas</h2>
                 <p>Retira tus ganancias</p>
-            <form>
-                <div class="grupo-form">
-                    <label for="retiro-monto">Cantidad a Retirar</label>
-                    <input type="number" id="retiro-monto" name="retiro-monto" placeholder="Ingresa Cantidad" min="5USD">
-                </div>
-                <div class="grupo-form">
-                    <label for="metodo-retiro">Método de Retiro</label>
-                    <select name="metodo-retiro" id="metodo-retiro">
-                        <option value="paypal">Paypal</option>
-                        <option value="tarjeta">Tarjeta de Débito/Crédito</option>
-                        <option value="criptomonedas">Criptomonedas</option>
-                    </select>
-                </div>
-                <div class="grupo-form">
-                    <label for="cuenta-destino">Cuenta de Destino</label>
-                    <input type="text" id="cuenta-destino" name="cuenta-destino" placeholder="Número de Cuenta">
-                </div>
-                <div class="text-center">
-                    <button type="submit" class="bn-login">Solicitar Retiro</button>
-                </div>
-            </form>
+                <!-- ¡FORMULARIO FUNCIONAL! -->
+                <form action="/withdraw" method="POST">
+                    <div class="grupo-form">
+                        <label for="retiro-monto">Cantidad a Retirar</label>
+                        <input type="number" id="retiro-monto" name="monto" placeholder="Ingresa Cantidad" min="1" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="metodo-retiro">Método de Retiro</label>
+                        <select name="metodo-retiro" id="metodo-retiro">
+                            <option value="paypal">Paypal</option>
+                            <option value="tarjeta">Tarjeta de Débito/Crédito</option>
+                            <option value="criptomonedas">Criptomonedas</option>
+                        </select>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="cuenta-destino">Cuenta de Destino</label>
+                        <input type="text" id="cuenta-destino" name="cuenta-destino" placeholder="Número de Cuenta" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="bn-login">Solicitar Retiro</button>
+                    </div>
+                </form>
             </section>
         </div>
+
+        <!-- Historial Completo de Transacciones -->
+        <section class="rules-card profile-transactions" style="margin-top: 2rem;">
+            <h2>Historial de Transacciones</h2>
+            <ul class="transaction-list">
+                {{#each transacciones}}
+                  <li class="item-transaction">
+                      <div>
+                          {{#if (eq tipo "bet")}}
+                            <div class="tipo-transaccion">
+                              Apuesta Ruleta ({{status}})
+                            </div>
+                          {{else}}
+                            <!-- Capitaliza el tipo: 'deposit' -> 'Deposit' -->
+                            <div class="tipo-transaccion" style="text-transform: capitalize;">{{tipo}}</div>
+                          {{/if}}
+                          <div class="transaction-date">{{this.fecha}}</div>
+                      </div>
+
+                      {{#if (eq tipo "bet")}}
+                        <!-- Lógica para apuestas (rojo/verde) -->
+                        {{#if (eq status "win")}}
+                          <div class="transaction-positive">+${{ganancia}}</div>
+                        {{else}}
+                          <div class="transaction-negative">-${{monto}}</div>
+                        {{/if}}
+                      {{else if (eq tipo "deposit")}}
+                        <!-- Lógica para depósitos (verde) -->
+                         <div class="transaction-positive">+${{monto}}</div>
+                      {{else}}
+                        <!-- Lógica para retiros (rojo) -->
+                         <div class="transaction-negative">-${{monto}}</div>
+                      {{/if}}
+                  </li>
+                {{else}}
+                  <li class="item-transaction">
+                    <p>No has realizado ninguna transacción.</p>
+                  </li>
+                {{/each}}
+            </ul>
+        </section>
     </main>
-</body>
-</html>
+</div>

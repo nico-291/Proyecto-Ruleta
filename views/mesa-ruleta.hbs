@@ -1,154 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mesa de Ruleta Europea</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-     <nav class="navbar">
-        <div class="nav_container">
-            <a href="index.html">Casino Ruleta</a>
-            <ul class="links_nav">
-                <li><a href="Perfil.html">Perfil</a></li>
-                <li><a href="Transacciones.html">Transacciones</a></li>
-                <li><a href="MesaRuleta.html">Mesa de Ruleta</a></li>
-                <li><a href="index.html">Cerrar Sesión</a></li>
-            </ul>
-        </div>
-    </nav>
-  <main class="container">
-        <header class="text-center mb-20">
-            <h1>Mesa de Ruleta Europea</h1>
-        </header>
+<div class="roulette-game-container">
+  <header class="text-center mb-30">
+    <h1 class="roulette-title">Mesa de Ruleta Europea</h1>
+    <div class="game-status betting">
+      <div>Estado: <strong>Recibiendo Apuestas</strong></div>
+    </div>
+  </header>
 
-        <section class="game-status betting">
-            <div>Estado: Recibiendo Apuestas</div>
-        </section>
+  <div class="metrics-grid mb-20">
+    <div class="metric-card">
+      <h2>Saldo Disponible</h2>
+      <div id="saldo-actual" class="metric-value">${{user.saldo}}</div>
+    </div>
+    <div class="metric-card">
+      <h3>Apuesta Total</h3>
+      <div id="apuesta-actual" class="metric-value">$0</div>
+    </div>
+    <div class="metric-card">
+      <h3>Ganancia Potencial</h3>
+      <div id="ganancia-potencial" class="metric-value">$0</div>
+    </div>
+  </div>
 
-        <div class="metrics-grid mb-20">
-            <div class="metric-card">
-                <h2>Saldo Disponible</h2>
-                <div class="metric-value">$125.75</div>
-            </div>
-            <div class="metric-card">
-                <h3>Apuesta Total</h3>
-                <div class="metric-value">$100.0</div>
-            </div>
-            <div class="metric-card">
-                <h3>Ganancia Potencial</h3>
-                <div class="metric-value">$315.00</div>
-            </div>
-        </div>
+  <div class="roulette-wrap">
+    <div class="pointer" aria-hidden="true"></div>
+    <div id="wheel" class="wheel" role="img" aria-label="Ruleta europea"></div>
+  </div>
 
-        <div class="roulette-section">
-            <section class="roulette-container">
-                <h2>Ruleta Europea</h2>
-                <div class="roulette-wheel">
-                    <img src="https://cdn.discordapp.com/attachments/1106035379263524905/1414099418214301747/roulette-wheel_eu.png?ex=68be5635&is=68bd04b5&hm=9c8e88bc486cfe01204c43ddc08b5fd4a4d353a65b6bcec6fef07cd84eba1d26" 
-                         alt="Ruleta Europea" 
-                         class="roulette-image">
-                </div>
-                <div class="text-center mt-20">
-                    <button class="bn-login">
-                        GIRAR RULETA
-                    </button>
-                </div>
-            </section>
+  <div class="roulette-controls">
+    <input type="number" id="numeroInput" placeholder="Número (0-36)" />
+    <input type="number" id="montoInput" placeholder="Monto $" />
+    <button id="apostarBtn">Apostar</button>
+    
+    <button id="spinBtn" class="spin-btn">GIRAR RULETA</button>
+    <div id="status" class="roulette-status" aria-live="polite">
+      Haz tu apuesta para comenzar
+    </div>
+  </div>
 
-            <section class="additional-image-container">
-                <h2>Mesa de Apuestas</h2>
-                <div class="additional-image-placeholder">
-                    <img src="https://cdn.discordapp.com/attachments/1106035379263524905/1414318722033647696/Tablero20ruleta2002_1.png?ex=68bf2274&is=68bdd0f4&hm=4d0dec3d35957a290b13051c9241afa482c52d5eba795f0facb54899725f6246"
-                         alt="Mesa Ruleta" 
-                         class="table-image">
-                </div>
-            </section>
-        </div>
+  <div class="last-numbers">
+    <h3>Últimos Números Ganadores</h3>
+    <ul id="winning-numbers-list" class="winning-numbers-ui">
+    </ul>
+  </div>
 
-        <div class="last-numbers">
-            <h3>Últimos 5 Números Ganadores</h3>
-            <div class="numbers-grid">
-                <div class="bet-number red">7</div>
-                <div class="bet-number black">22</div>
-                <div class="bet-number red">19</div>
-                <div class="bet-number green">0</div>
-                <div class="bet-number black">15</div>
-            </div>
-        </div>
+  <div class="last-numbers">
+    <h3>Mis Últimas Apuestas (Historial)</h3>
+    <ul>
+      {{#each apuestas}}
+        <li>Número: {{this.numero}} — Monto: ${{this.monto}} — Fecha: {{this.fecha}}</li>
+      {{else}}
+        <li>No has realizado apuestas.</li>
+      {{/each}}
+    </ul>
+  </div>
 
-        <section class="card">
-            <h2>Mis Últimas 5 Apuestas</h2>
-            <div style="overflow-x: auto;">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Hora</th>
-                            <th>Tipo de Apuesta</th>
-                            <th>Monto</th>
-                            <th>Número Ganador</th>
-                            <th>Resultado</th>
-                            <th>Variación Saldo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>14:32</td>
-                            <td>Rojo + Número 7</td>
-                            <td>$50.00</td>
-                            <td>7 (Rojo)</td>
-                            <td>Ganado</td>
-                            <td class="positive">+$180.00</td>
-                        </tr>
-                        <tr>
-                            <td>14:28</td>
-                            <td>Negro</td>
-                            <td>$25.00</td>
-                            <td>19 (Rojo)</td>
-                            <td>Perdido</td>
-                            <td class="negative">-$25.00</td>
-                        </tr>
-                        <tr>
-                            <td>14:25</td>
-                            <td>Par + 2ª Docena</td>
-                            <td>$40.00</td>
-                            <td>22 (Negro)</td>
-                            <td>Ganado</td>
-                            <td class="positive">+$120.00</td>
-                        </tr>
-                        <tr>
-                            <td>14:21</td>
-                            <td>Número 0</td>
-                            <td>$10.00</td>
-                            <td>15 (Negro)</td>
-                            <td>Perdido</td>
-                            <td class="negative">-$10.00</td>
-                        </tr>
-                        <tr>
-                            <td>14:18</td>
-                            <td>Impar</td>
-                            <td>$20.00</td>
-                            <td>17 (Negro)</td>
-                            <td>Ganado</td>
-                            <td class="positive">+$20.00</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+  <section class="card text-center mt-30">
+    <h2>Controles de Juego</h2>
+    <div class="controls-grid">
+      <a href="/perfil" class="bn-login">Volver al Perfil</a>
+      <a href="/transacciones" class="bn-register">Hacer Transacción</a>
+    </div>
+  </section>
+</div>
 
-        <section class="card text-center">
-            <h2>Controles de Juego</h2>
-            <div class="controls-grid">
-                <a href="Perfil.html" class="bn-login">
-                    Volver al Perfil
-                </a>
-                <a href="Transacciones.html" class="bn-register">
-                    Hacer Transacción
-                </a>
-            </div>
-        </section>
-    </main>
-</body>
-</html>
+<script src="/js/ruleta.js"></script>

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const TransaccionSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   tipo: { type: String, enum: ['deposito', 'retiro', 'apuesta'], required: true },
   monto: { type: Number, required: true },
   detallesApuesta: { type: String },

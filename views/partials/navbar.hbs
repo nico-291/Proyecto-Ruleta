@@ -2,22 +2,19 @@
     <div class="nav_container">
         <a href="/">Gira y Apuesta</a>
         <ul class="links_nav">
-            {{#if user}}
-
+        {{#if user}}
             <li><a href="/perfil">Perfil</a></li>
             <li><a href="/transacciones">Transacciones</a></li>
             <li><a href="/mesa-ruleta">Mesa-Ruleta</a></li>
             <li><a href="/logout">Cerrar Sesión</a></li>
 
-            {{#else}}
-
+        {{else}}
             <li><a href="/">Inicio</a></li>
             <li><a href="/register">Registro</a></li>
             <li><a href="/login">Acceso</a></li>
             <li><a href="/rules">Reglas</a></li>
             <li><a href="/info">Nosotros</a></li>
-            {{/if}}
-                    
+        {{/if}}
         </ul>
     </div>
 </nav>

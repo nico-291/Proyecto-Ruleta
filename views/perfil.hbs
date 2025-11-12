@@ -1,81 +1,55 @@
-
 <div class="container">
-    <header>
-        <h1>Perfil de Usuario</h1>
-    </header>
-    <main class="profile-grid">
-        <section class="rules-card profile-info">
-            <h2>Información Personal</h2>
-            <!-- 
-              ¡DATOS DINÁMICOS! 
-              'user' viene de res.locals.user en app.js
-            -->
-            <p><strong>Usuario: </strong>{{user.username}}</p>
-            <p><strong>Correo: </strong>{{user.email}}</p>
-            <p><strong>Fecha de Registro: </strong>{{user.createdAt}}</p>
+  <header>
+    <h1>Perfil de Usuario</h1>
+  </header>
+  <main class="profile-grid">
+   <section class="rules-card profile-info">
+    <h2>Información Personal</h2>
+    <p><strong>Usuario: </strong>{{user.username}}</p>
+    <p><strong>Correo: </strong>{{user.email}}</p>
+    <p><strong>Fecha de Registro: </strong>{{user.createdAt}}</p>
+    </section>
+
+<section class="saldo profile-balance">
+  <h2>Saldo Actual</h2>
+    <div class="balance-amount">${{user.saldo}}</div>
+    <p>Saldo Virtual Disponible</p>
+</section>
+
+<section class="rules-card profile-transactions">
+  <h2>Ultimas 5 Transacciones</h2>
+    <ul class="transaction-list">
+      {{#each transacciones}}
+      <li class="item-transaction">
+        <div>
+          {{#if (eq tipo "bet")}}
+          <div class="tipo-transaccion">
+            Apuesta Ruleta ({{status}})
+          </div>
+        {{else}}
+        <div class="tipo-transaccion">{{tipo}}</div>
+        {{/if}}
+    <div class="transaction-date">{{this.fecha}}</div>
+      </div>
+      {{#if (eq status "win")}}
+      <div class="transaction-positive">+${{ganancia}}</div>
+      {{else if (eq tipo "bet")}}
+        <div class="transaction-negative">-${{monto}}</div>
+      {{else}}
+        <div class="transaction-positive">+${{monto}}</div>
+        {{/if}}
+      </li>
+      {{else}}
+      <li class="item-transaction">
+        <p>No tienes transacciones recientes.</p>
+      </li>
+      {{/each}}
+          </ul>
         </section>
-
-        <section class="saldo profile-balance">
-            <h2>Saldo Actual</h2>
-            <!-- ¡SALDO DINÁMICO! -->
-            <div class="balance-amount">${{user.saldo}}</div>
-            <p>Saldo Virtual Disponible</p>
-        </section>
-
-        <section class="rules-card profile-transactions">
-            <h2>Ultimas 5 Transacciones</h2>
-            <!-- 
-              ¡LISTA DINÁMICA!
-              'transacciones' viene de la ruta GET /perfil en app.js
-            -->
-            <ul class="transaction-list">
-                {{#each transacciones}}
-                  <li class="item-transaction">
-                      <div>
-                          <!-- 
-                            Usamos {{#if}} para mostrar el tipo de transacción
-                          -->
-                          {{#if (eq tipo "bet")}}
-                            <!-- Si es una apuesta, mostramos si ganó o perdió -->
-                            <div class="tipo-transaccion">
-                              Apuesta Ruleta ({{status}})
-                            </div>
-                          {{else}}
-                            <!-- Si es depósito/retiro -->
-                            <div class="tipo-transaccion">{{tipo}}</div>
-                          {{/if}}
-
-                          <div class="transaction-date">{{this.fecha}}</div>
-                      </div>
-
-                      <!-- 
-                        Usamos {{#if}} para el color del monto
-                      -->
-                      {{#if (eq status "win")}}
-                        <div class="transaction-positive">+${{ganancia}}</div>
-                      {{else if (eq tipo "bet")}}
-                        <div class="transaction-negative">-${{monto}}</div>
-                      {{else}}
-                         <div class="transaction-positive">+${{monto}}</div>
-                      {{/if}}
-                  </li>
-                {{else}}
-                  <!-- Esto se muestra si no hay transacciones -->
-                  <li class="item-transaction">
-                    <p>No tienes transacciones recientes.</p>
-                  </li>
-                {{/each}}
-            </ul>
-        </section>
-        
     </main>
     <section class="rules-card profile-access">
           <h3>Acceso al Juego</h3>
           <div class="grid-grid2">
-              <!-- 
-                ¡Enlaces dinámicos!
-                Usamos las rutas de HBS, no .html
-              -->
               <a href="/mesa-ruleta" class="bn-login">Mesa de Ruleta</a>
               <a href="/transacciones" class="bn-register">Ver Transacciones</a>
           </div>

@@ -15,19 +15,23 @@
   const winningNumbersListEl = document.getElementById('winning-numbers-list');
   const saldoEl = document.getElementById('saldo-actual');
   const apuestaTotalEl = document.getElementById('apuesta-actual');
+  const gananciaPotencialEl = document.getElementById('ganancia-potencial');
 
   // --- Configuración de la Ruleta (Debe ser idéntica al servidor) ---
   const numbersCW = [
     0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
     5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
   ];
+  const PAGO_DIRECTO = 36;
   const redSet = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
   const isRed   = n => redSet.has(n);
   const isGreen = n => n === 0;
   const getColor = n => isGreen(n) ? 'green' : (isRed(n) ? 'red' : 'black');
 
   const seg = 360 / numbersCW.length;
-  const startAngle = -90 - seg / 2;
+  // Ángulo donde comienza el primer número (0). 
+  // Lo ajustamos para que el 0 quede exactamente bajo el puntero cuando la rotación es 0.
+  const startAngle = 90 + seg / 2; // Invertido para que el 0 quede a la derecha de la flecha
 
   // --- Estado del Juego (Cliente) ---
   let currentRotation = 0;
@@ -57,18 +61,28 @@
   function drawLabels() {
     const labelsWrap = document.createElement('div');
     labelsWrap.className = 'labels';
+    // Se elimina cualquier etiqueta existente para evitar duplicados
+    wheel.querySelectorAll('.labels').forEach(el => el.remove());
     wheel.appendChild(labelsWrap);
-    const R = wheel.clientWidth / 2 - 40; // Radio
+    
+    const R = wheel.clientWidth / 2 - 25; // Radio ajustado para centrado
+    
     numbersCW.forEach((n, i) => {
       const label = document.createElement('div');
       label.className = 'label' + (n === 0 ? ' green' : '');
       label.textContent = n;
-      const phi = startAngle + (i + 0.5) * seg; // Ángulo
-      const rad = phi * Math.PI / 180;
+      
+      // El ángulo del centro del segmento es: (i * seg) + (seg / 2)
+      // Ajustamos el inicio a 90 grados (arriba) para rotar desde allí
+      const phi = (i * seg) + (seg / 2) + 90; // Ángulo en grados
+      const rad = phi * Math.PI / 180; // Ángulo en radianes
+      
       const x = Math.cos(rad) * R;
       const y = Math.sin(rad) * R;
-      label.style.setProperty('--pos', `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)`);
-      label.style.transform = `translate(-50%, -50%) var(--pos)`;
+
+      // Posicionamiento de la etiqueta
+      label.style.transform = `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px) rotate(${phi - 90}deg)`;
+      
       labelsWrap.appendChild(label);
     });
   }
@@ -132,11 +146,12 @@
     showStatus("Procesando apuesta...");
 
     try {
-      // ¡Llama a la API del SERVIDOR!
+      // Llama a la API del SERVIDOR
       const response = await fetch('/api/apostar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ numero, monto })
+        body: JSON.stringify({ numero, monto }),
+        credentials: 'include' 
       });
 
       const data = await response.json();
@@ -149,6 +164,10 @@
       saldoEl.textContent = `$${data.nuevoSaldo}`;
       totalBetAmount = data.apuestaTotal;
       apuestaTotalEl.textContent = `$${totalBetAmount}`;
+      
+      if (gananciaPotencialEl) {
+        gananciaPotencialEl.textContent = `$${totalBetAmount * PAGO_DIRECTO}`;
+      }
       
       showStatus(`Apuesta de $${monto} al ${numero} aceptada.`);
       numeroInput.value = '';
@@ -168,13 +187,13 @@
   // --- Lógica de Giro (Cliente) ---
   // Se llama al presionar "GIRAR RULETA"
   async function handleSpin() {
-    if (spinning) return;
+    if (spinning || totalBetAmount === 0) return;
     setControlsEnabled(false); // Deshabilita todo
     showStatus('Girando…');
 
     try {
-      // ¡Llama a la API del SERVIDOR para obtener el resultado!
-      const response = await fetch('/api/girar', { method: 'POST' });
+      // Llama a la API del SERVIDOR para obtener el resultado!
+      const response = await fetch('/api/girar', { method: 'POST', credentials: 'include' });
       const data = await response.json();
 
       if (!response.ok) {
@@ -183,7 +202,7 @@
       
       const { winningNumber, nuevoSaldo, ganancia } = data;
 
-      // ¡El servidor nos dijo el resultado!
+      // El servidor nos dijo el resultado!
       // Ahora, animamos la ruleta a ese número.
       spinTo(winningNumber, () => {
         // Esta función se ejecuta CUANDO LA ANIMACIÓN TERMINA
@@ -192,6 +211,9 @@
         saldoEl.textContent = `$${nuevoSaldo}`;
         totalBetAmount = 0;
         apuestaTotalEl.textContent = '$0';
+        if (gananciaPotencialEl) {
+          gananciaPotencialEl.textContent = '$0';
+        }
         
         // 2. Mostrar mensaje de ganancia/pérdida
         showStatus(ganancia > 0 ? `¡Ganaste $${ganancia}!` : "No ganaste esta ronda.");
@@ -213,10 +235,11 @@
       console.error("Error en handleSpin:", error);
       showStatus(error.message, true);
       setControlsEnabled(true);
+      spinBtn.disabled = (totalBetAmount === 0);
     }
   }
 
-  // Función de animación
+  // Función de animación (CORREGIDA)
   function spinTo(winningNumber, onAnimationEndCallback) {
     const targetIdx = numbersCW.indexOf(winningNumber);
     if (targetIdx < 0) {
@@ -224,16 +247,31 @@
       return;
     }
 
-    // Calcula a dónde debe girar
-    const targetBaseRotation = -(targetIdx * seg); // Rotación base para ese número
-    const extraSpins = 360 * 5; // 5 vueltas extra
-    const currentNormalized = ((currentRotation % 360) + 360) % 360;
-    const targetNormalized = ((targetBaseRotation % 360) + 360) % 360;
+    // 1. Calcular la rotación base necesaria para centrar el número ganador.
+    // El '0' está al inicio del array. Queremos que el centro del segmento
+    // del número ganador esté en el punto de la flecha (posición 0, arriba).
+    // La ruleta está dibujada con el 0 en la parte superior derecha (debido al conic-gradient).
     
-    let spinAmount = (targetNormalized - currentNormalized) + extraSpins;
-    if (spinAmount < extraSpins) spinAmount += 360; // Asegura que gire en la dirección correcta
+    // Rotación del centro del segmento:
+    const targetCenterAngle = (targetIdx * seg) + (seg / 2);
 
-    currentRotation += spinAmount;
+    // Queremos que el targetCenterAngle se alinee con el ángulo de la flecha (360 - 90 = 270 grados en la vista CSS)
+    // El punto donde apunta la flecha está a 270 grados (o -90 grados).
+    // La rotación para centrar el número es: 
+    // targetRotation = (360 - targetCenterAngle) + offset_para_el_inicio_del_dibujo
+    
+    // El offset de dibujo es 90 + seg/2 (en paintWheel)
+    // La rotación necesaria es la negativa del ángulo central
+    let targetRotation = -targetCenterAngle;
+    
+    // 2. Asegurar que gire varias veces (5 vueltas extra)
+    const extraSpins = 360 * 5; 
+    
+    // 3. Calcular la diferencia neta de rotación (asegurar el giro hacia adelante)
+    const totalRotation = currentRotation + extraSpins + targetRotation;
+    
+    // Usamos el totalRotation para asegurar un giro suave y completo
+    currentRotation = totalRotation;
     const duration = 4.5; // Duración de la animación en segundos
 
     // Aplica la animación CSS
@@ -250,11 +288,16 @@
       if (labels[targetIdx]) labels[targetIdx].classList.add('win');
       lastWinIdx = targetIdx;
 
-      // Normaliza la rotación
-      currentRotation = ((currentRotation % 360) + 360) % 360;
+      // Normaliza la rotación para que no se acumulen valores gigantes (y así la transición sea más limpia en la próxima)
+      const normalizedRotation = currentRotation % 360;
+      
+      // La ruleta debe rotar hasta el ángulo negativo del centro del segmento del número ganador,
+      // más 90 grados para compensar la flecha
+      currentRotation = normalizedRotation - (targetCenterAngle - 90); 
+      
       wheel.style.transition = 'none';
       wheel.style.transform = `rotate(${currentRotation}deg)`;
-      void wheel.offsetWidth;
+      void wheel.offsetWidth; // Forzar un reflow
       
       // Llama a la función de callback
       if (onAnimationEndCallback) {
@@ -271,7 +314,8 @@
     paintWheel(); // Dibuja el fondo de la ruleta
     drawLabels(); // Dibuja los números
     showStatus('Haz tu apuesta y gira');
-    spinBtn.disabled = true; // Deshabilitado hasta que se apueste
+    // Para asegurar que las etiquetas se redibujan correctamente en caso de redimensionamiento
+    window.addEventListener('resize', drawLabels);
     
     // Asigna las funciones a los botones
     apostarBtn.addEventListener('click', handleBet);

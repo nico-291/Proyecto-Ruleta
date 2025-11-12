@@ -5,7 +5,10 @@
     --card-border: 2px solid var(--primary-gold);
     --card-radius: 15px;
     --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    --transition: all 0.3s ease
+    --transition: all 0.3s ease;
+    --red: #D92B2F;
+    --green: #298E40;
+    --black: #0F0F0F;
 }
 /*{
 margin: 0;
@@ -478,45 +481,7 @@ h3 {
     color: var(--secondary-gold);
     margin-top: 0.5rem;
 }
-.roulette-section{
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    margin: 2.5rem 0;
-}
-.roulette-container, .additional-image-container{
-    background: var(--dark-bg);
-    border: var(--card-border);
-    border-radius: var(--card-radius);
-    padding: clamp(1.5rem, 2.5vw, 2rem);
-    text-align: center;
-}
-.roulette-image{
-    width: 100%;
-    max-width: min(400px, 30vw);
-    height: auto;
-    border-radius: 50%;
-    border: clamp(3px, 0.5vw, 5px) solid var(--primary-gold);
-}
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
-}
-.table-image{
-    width: 100%;
-    max-width: min(500px, 35vw);
-    height: auto;
-    border: clamp(2px, 0.3vw, 3px) solid var(--primary-gold);
-    border-radius: 10px;
-}
-.additional-image-placeholder{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
-}
+
 .last-numbers{
     background: var(--dark-bg);
     border: var(--card-border);
@@ -525,26 +490,6 @@ h3 {
     text-align: center;
     margin: 2rem 0;
 }
-.numbers-grid{
-    display: flex;
-    justify-content: center;
-    gap: clamp(0.5rem, 1.5vw, 1rem);
-    margin-top: 1rem;
-    flex-wrap: wrap;
-}
-.bet-number{
-    width: clamp(40px, 5vw, 60px);
-    height: clamp(40px, 5vw, 60px);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: clamp(0.9rem, 1.5vw, 1.2rem);
-}
-.bet-number.red {background: #ff4444; color: white;}
-.bet-number.black {background: #333; color: white;}
-.bet-number.green {background: #00c851; color: white;}
 .controls-grid{
     display: flex;
     justify-content: center;
@@ -564,11 +509,6 @@ h3 {
     background: rgba(11, 34, 23, 0.2);
     color: #cad8d7e5;
     border: 2px solid #ffd700;
-}
-
-.roulette-section {
-    grid-template-columns: 1fr;
-    gap: 20px;
 }
     
 .controls-grid {
@@ -594,4 +534,195 @@ h3 {
 .grid.grid-2{
     max-width: 1200px;
     margin: 0 auto;
+}
+
+/* css ruleta */
+
+.roulette-game-container h1.roulette-title {
+    color: var(--primary-gold);
+    text-align: center;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    margin-bottom: 1.5rem;
+}
+
+
+.roulette-wrap {
+    position: relative;
+    width: 90vw; 
+    max-width: 500px; 
+    aspect-ratio: 1 / 1; 
+    margin: 2rem auto; 
+}
+
+/* puntero*/
+.pointer {
+    position: absolute;
+    top: -5px; 
+    left: 50%;
+    transform: translateX(-50%) rotate(180deg); 
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 25px solid var(--primary-gold); 
+    z-index: 10;
+    filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.5));
+}
+
+/* girar */
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; 
+    border: 10px solid var(--primary-gold); 
+    box-shadow: 0 0 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.4);
+    
+    background-color: var(--dark-bg); 
+    background-image: conic-gradient(red 0deg 9.7deg, black 9.7deg 19.4deg); /* Fondo de reserva */
+    
+    position: relative;
+    
+    transition: transform 0.5s ease-out;
+}
+
+.labels {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+
+/* Estilo número (0-36) */
+.label {
+    position: absolute;
+    top: 50%;
+    left: 50%; 
+    color: white;
+    text-align: center; 
+    font-size: clamp(0.8rem, 1.5vw, 1.1rem);
+    font-weight: bold;
+    text-shadow: 0 0 3px rgba(0,0,0,0.7);
+    width: 30px; 
+    height: 15px;
+    line-height: 15px; 
+}
+.label.green {
+    color: var(--green); 
+}
+.label.win {
+    color: var(--secondary-gold);
+    text-shadow: 0 0 10px var(--secondary-gold);
+    transform: translate(-50%, -50%) scale(1.5) !important; 
+    transition: all 0.3s ease;
+}
+
+
+/*Controles y Resultados*/
+
+.roulette-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--dark-bg);
+    border: var(--card-border);
+    border-radius: var(--card-radius);
+    max-width: 800px;
+    margin: 1rem auto;
+}
+
+.roulette-controls input[type="number"] {
+    padding: 0.8rem;
+    border: 1px solid var(--primary-gold);
+    border-radius: 8px;
+    background: #fff;
+    color: #0e0707;
+    font-size: 1rem;
+    width: 150px;
+}
+
+.roulette-controls button {
+    padding: 0.8rem 1.5rem;
+    border: 2px solid var(--primary-gold);
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+    background-color: transparent;
+    color: var(--primary-gold);
+}
+.roulette-controls button:hover {
+    background-color: rgba(199, 155, 59, 0.1);
+    transform: translateY(-2px);
+}
+.roulette-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+.roulette-controls button.spin-btn {
+    background-color: var(--primary-gold);
+    color: var(--dark-bg);
+}
+.roulette-controls button.spin-btn:hover {
+    background-color: var(--secondary-gold);
+}
+
+.roulette-status {
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+}
+
+/*resultado (ej: "15 - ROJO") */
+.result-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background-color: rgba(0,0,0,0.7);
+    border: 2px solid var(--primary-gold);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: white;
+}
+.result-chip.error {
+    border-color: var(--red);
+    color: var(--red);
+}
+
+/* El puntito de color en el lista */
+.result-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+.result-dot.dot-red { background-color: var(--red); }
+.result-dot.dot-green { background-color: var(--green); }
+.result-dot.dot-black { background-color: var(--black); }
+
+/* Lista de últimos números */
+.winning-numbers-ui {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+.winning-numbers-ui li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(0,0,0,0.5);
+    padding: 0.3rem 0.8rem;
+    border-radius: 50px;
+    font-weight: bold;
+    color: white;
+    font-size: 1rem;
 }

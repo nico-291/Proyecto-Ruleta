@@ -26,13 +26,12 @@ const PAGO_DIRECTO = 36; // Pago 36 a 1
  * El cliente envía una apuesta.
  */
 router.post('/apostar', async (req, res) => {
-  // ¡¡AUTENTICACIÓN!! 
-  // 'req.user' es adjuntado por nuestro middleware en app.js
-  // (que leyó la cookie 'userId')
-  const userId = req.user?.id; 
+  // ¡¡CORRECCIÓN!!
+  // req.user viene de .lean(), por lo que su ID es ._id
+  const userId = req.user?._id; 
   
   if (!userId) {
-    return res.status(401).json({ message: "No estás autenticado" });
+    return res.status(401).json({ message: "No estás autenticado (Ref: _id)" });
   }
 
   const { numero, monto } = req.body;
@@ -46,7 +45,9 @@ router.post('/apostar', async (req, res) => {
   }
 
   try {
-    const user = await User.findById(userId);
+    // Usamos el userId que ya tenemos, no es necesario buscarlo de nuevo
+    // PERO necesitamos el objeto de Mongoose para .save(), así que lo buscamos sin .lean()
+    const user = await User.findById(userId); 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
@@ -61,16 +62,16 @@ router.post('/apostar', async (req, res) => {
 
     // 2. Crear la apuesta pendiente (ahora 'Transaccion')
     const newBet = new Transaccion({ 
-      userId, 
-      numero, 
-      monto, 
-      tipo: 'bet', // Especificamos que es una apuesta
-      status: 'pending' 
-    });
+    user: userId, // <--- CORRECCIÓN (El campo se llama 'user')
+    numero, 
+    monto, 
+    tipo: 'apuesta', 
+    status: 'pending' 
+});
     await newBet.save();
 
     // 3. Calcular la apuesta total pendiente actual
-    const pendingBets = await Transaccion.find({ userId, status: 'pending', tipo: 'bet' });
+    const pendingBets = await Transaccion.find({ user: userId, status: 'pending', tipo: 'apuesta' }); // <--- CORRECCIÓN
     const apuestaTotal = pendingBets.reduce((sum, bet) => sum + bet.monto, 0);
 
     // 4. Enviar respuesta al cliente
@@ -92,14 +93,16 @@ router.post('/apostar', async (req, res) => {
  * El cliente pide girar.
  */
 router.post('/girar', async (req, res) => {
-  const userId = req.user?.id; 
+  // ¡¡CORRECCIÓN!!
+  // req.user viene de .lean(), por lo que su ID es ._id
+  const userId = req.user?._id; 
   
   if (!userId) {
-    return res.status(401).json({ message: "No estás autenticado" });
+    return res.status(401).json({ message: "No estás autenticado (Ref: _id)" });
   }
 
   try {
-    const pendingBets = await Transaccion.find({ userId, status: 'pending', tipo: 'bet' });
+    const pendingBets = await Transaccion.find({ user: userId, status: 'pending', tipo: 'apuesta' })
     if (pendingBets.length === 0) {
       return res.status(400).json({ message: "Debes realizar una apuesta antes de girar" });
     }
@@ -109,7 +112,7 @@ router.post('/girar', async (req, res) => {
     const winningNumber = numbersCW[randomIndex];
 
     let gananciaTotal = 0;
-    const user = await User.findById(userId);
+    const user = await User.findById(userId); // Obtenemos el objeto Mongoose para .save()
 
     // 2. Procesar cada apuesta pendiente
     for (const bet of pendingBets) {

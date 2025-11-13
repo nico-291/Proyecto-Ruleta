@@ -40,7 +40,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3000', 
+  origin: 'http://localhost:80', 
   credentials: true 
 }));
 app.use(cookieParser());
@@ -123,7 +123,7 @@ app.get('/transacciones', ensureAuth, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 app.listen(PORT, ()=> {
     console.log(`Servidor en http://localhost:${PORT}`);
 });

@@ -26,11 +26,11 @@ router.post('/register', async (req, res) => {
     });
     await newUser.save();
 
-  //Iniciar sesión automáticamente (crear la cookie)
+  //crear cookie
     res.cookie('userId', newUser._id.toString(), {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, //Expira en 7 días
-      path: '/' // <-- CORRECCIÓN
+      path: '/' 
     });
 
     res.redirect('/perfil');
@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
     res.cookie('userId', user._id.toString(), {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-      path: '/' // <-- CORRECCIÓN
+      path: '/' 
     });
 
     res.redirect('/perfil');
@@ -72,7 +72,7 @@ router.post('/login', async (req, res) => {
 
 //logout
 router.get('/logout', (req, res) => {
-  res.clearCookie('userId', { path: '/' }); // <-- CORRECCIÓN
+  res.clearCookie('userId', { path: '/' }); 
   res.redirect('/');
 });
 

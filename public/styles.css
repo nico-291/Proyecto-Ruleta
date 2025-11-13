@@ -488,7 +488,6 @@ h3 {
     border-radius: var(--card-radius);
     padding: clamp(1rem, 2vw, 1.5rem);
     text-align: center;
-    /* margin: 2rem 0; - Quitado para que quepa en la tarjeta de la ruleta */
 }
 .controls-grid{
     display: flex;
@@ -536,9 +535,7 @@ h3 {
     margin: 0 auto;
 }
 
-/* --- INICIO: CSS COMPLETO Y UNIFICADO DE LA RULETA --- */
-/* (Esto reemplaza todas las reglas viejas y duplicadas) */
-
+/*css de la ruleta*/
 .roulette-game-container h1.roulette-title {
     color: var(--primary-gold);
     text-align: center;
@@ -546,18 +543,16 @@ h3 {
     margin-bottom: 1.5rem;
 }
 
-/* --- 1. Layout Principal y Fichas --- */
-
 .roulette-layout {
   display: grid;
-  grid-template-columns: 4fr 5fr; /* Columna para la ruleta, columna para el tapete */
+  grid-template-columns: 4fr 5fr; 
   gap: 2rem;
   align-items: flex-start;
 }
 
 @media (max-width: 1024px) {
   .roulette-layout {
-    grid-template-columns: 1fr; /* Apila la ruleta encima del tapete */
+    grid-template-columns: 1fr; 
   }
 }
 
@@ -576,7 +571,7 @@ h3 {
     transform: translate(-50%, -50%);
     width: 30px; 
     height: 30px;
-    border-radius: 50%; /* La hace redonda */
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -633,15 +628,13 @@ h3 {
 .chip-btn[data-value="25"] { background-color: #298e40; color: white; }
 .chip-btn[data-value="100"] { background-color: #0f0f0f; color: white; border-color: #888; }
 
-/* --- 2. La Rueda de la Ruleta (Wheel) --- */
+/* rueda de la ruleta */
 
 .roulette-wrap {
     position: relative;
-    /* CORREGIDO: Ocupa el 100% de su columna, no 90vw */
     width: 100%; 
     max-width: 500px; 
     aspect-ratio: 1 / 1; 
-    /* CORREGIDO: Se centra dentro de su columna de grid */
     margin: 0 auto; 
 }
 
@@ -688,7 +681,6 @@ h3 {
     width: 30px; 
     height: 15px;
     line-height: 15px; 
-    /* El JS se encarga del 'transform' para la posición y rotación */
 }
 .label.green {
     color: var(--green); 
@@ -696,12 +688,11 @@ h3 {
 .label.win {
     color: var(--secondary-gold);
     text-shadow: 0 0 10px var(--secondary-gold);
-    /* Se aplica !important para sobreescribir el transform del JS temporalmente */
     transform: translate(-50%, -50%) scale(1.5) !important; 
     transition: all 0.3s ease;
 }
 
-/* --- 3. El Tapete de Apuestas (Table) --- */
+/* tablero de puestas  */
 
 .betting-table-container {
   flex: 2;
@@ -717,7 +708,7 @@ h3 {
 .betting-table {
     display: flex;
     flex-direction: row;
-    min-width: 800px; /* Ancho mínimo para que el tablero se vea bien */
+    min-width: 800px; 
     padding: 5px;
     background-color: #0a481c; 
     border-radius: 10px;
@@ -740,25 +731,24 @@ h3 {
 
 .number-grid {
     display: grid;
-    /* Crea 12 columnas, cada una de 1 fracción */
     grid-template-columns: repeat(12, 1fr);
-    gap: 2px; /* Espacio entre las celdas */
+    gap: 2px;
 }
-/* Contenedor de las Docenas (1st 12, 2nd 12, 3rd 12) */
+/* 1st 12, 2nd 12, 3rd 12 */
 .dozen-bets {
     display: grid;
     grid-template-columns: repeat(3, 1fr); 
     gap: 2px;
     margin-top: 2px;
 }
-/*Contenedor de las apuestas externas (Par, Impar, Rojo, etc.) */
+/*Par, Impar, Rojo, etc.*/
 .outside-bets{
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 2px;
     margin-top: 2px;
 }
-/*Estilos generales de TODAS las celdas de apuesta */
+
 .bet-cell{
     position: relative;
     display: flex;
@@ -784,7 +774,7 @@ h3 {
 
 .bet-cell.outside {
   font-size: 0.9rem;
-  aspect-ratio: 2 / 1; /* Celdas más anchas */
+  aspect-ratio: 2 / 1; 
   text-transform: uppercase;
 }
 
@@ -812,9 +802,8 @@ h3 {
   opacity: 0.9;
 }
 
-/* --- 4. Controles, Status y Resultados --- */
 
-/* Contenedor para botones 'Girar' y 'Limpiar' */
+/*botones girar y limpiar*/
 .roulette-controls {
     display: flex;
     flex-wrap: wrap;
@@ -826,7 +815,6 @@ h3 {
     margin: 1rem auto 0 auto;
 }
 
-/* Botones dentro de .roulette-controls */
 .roulette-controls button {
     padding: 0.8rem 1.5rem;
     border: 2px solid var(--primary-gold);
@@ -856,14 +844,12 @@ h3 {
     background-color: var(--secondary-gold);
 }
 
-/* Mensaje de estado (ej: "Girando...") */
 .roulette-status {
     width: 100%;
     text-align: center;
     margin-top: 1rem;
 }
 
-/* Chip de resultado (ej: "15 - ROJO") */
 .result-chip {
     display: inline-flex;
     align-items: center;
@@ -881,7 +867,6 @@ h3 {
     color: var(--red);
 }
 
-/* El punto de color en la lista */
 .result-dot {
     width: 18px;
     height: 18px;
@@ -892,7 +877,7 @@ h3 {
 .result-dot.dot-green { background-color: var(--green); }
 .result-dot.dot-black { background-color: var(--black); }
 
-/* Lista de últimos números */
+/* ultimos numeros */
 .winning-numbers-ui {
     display: flex;
     flex-wrap: wrap;
@@ -919,7 +904,4 @@ h3 {
     color: var(--black);
 }
 
-/*Colores específicos para las celdas */
 .bet-cell.zero { background-color: var(--green); }
-
-/* --- FIN: CSS COMPLETO DE LA RULETA --- */

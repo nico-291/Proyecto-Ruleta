@@ -1,7 +1,5 @@
 window.onload = () => {
 
-    // --- Elementos del DOM ---
-    // (Ahora sí se encontrarán todos estos elementos)
     const wheel = document.getElementById('wheel');
     const spinBtn = document.getElementById('spinBtn');
     const clearBetsBtn = document.getElementById('clearBetsBtn'); // Nuevo botón
@@ -13,7 +11,6 @@ window.onload = () => {
     const bettingTable = document.querySelector('.betting-table');
     const numberGrid = document.querySelector('.number-grid');
 
-    // --- Configuración de la Ruleta (Debe ser idéntica al servidor) ---
     const numbersCW = [
         0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
         5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
@@ -26,7 +23,6 @@ window.onload = () => {
     const seg = 360 / numbersCW.length;
     const startAngle = 0;
 
-    // --- Estado del Juego (Cliente) ---
     let currentRotation = 0;
     let spinning = false;
     let lastWinIdx = null;
@@ -113,20 +109,16 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
     betCell.appendChild(chipEl);
 
     const betType = betCell.dataset.betType;
-    const betValue = betCell.dataset.betValue; // ej: "10", "red", "1st 12"
+    const betValue = betCell.dataset.betValue;
 
-    // Guarda la apuesta (esto es para el cálculo del servidor)
     const betKey = `${betType}-${betValue}`;
     if (!currentBets[betKey]) {
         currentBets[betKey] = 0;
     }
     currentBets[betKey] += chipValue;
     
-    // Actualiza los totales
     totalBetAmount += chipValue;
     
-    // Actualiza los elementos del DOM
-    // saldoEl.textContent = `$${saldo}`;
     apuestaTotalEl.textContent = `$${totalBetAmount}`;
     spinBtn.disabled = false; // Activa el botón de girar
 
@@ -143,12 +135,11 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
 
   function updateBetsUI() {
     
-    // 1. Limpia todas las fichas visuales
+    //Limpia todas las fichas visuales
     if (bettingTable) {
         bettingTable.querySelectorAll('.chip-on-board').forEach(chip => chip.remove());
     }
 
-    // 2. Resetea el monto total (ya que 'currentBets' se vació)
     totalBetAmount = 0;
     
     if (apuestaTotalEl) {
@@ -160,8 +151,6 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
     }
 }
 
-    // --- LÓGICA DE LA RULETA (EXISTENTE) ---
-
     function paintWheel() {
         if (!wheel) return;
         const parts = numbersCW.map((n, i) => {
@@ -172,8 +161,7 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
         });
         const bg = `
       radial-gradient(circle at 50% 50%, #0000 58%, rgba(255,255,255,.06) 58.2% 59%, #0000 59%),
-      conic-gradient(from ${startAngle}deg, ${parts.join(',')})
-    `;
+      conic-gradient(from ${startAngle}deg, ${parts.join(',')})`;
         wheel.style.background = bg;
     }
 
@@ -246,7 +234,6 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
         }
     }
 
-    // --- LÓGICA DE GIRO (ACTUALIZADA) ---
     async function handleSpin() {
         if (spinning || totalBetAmount === 0) return;
         
@@ -254,57 +241,51 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
         showStatus('Girando…');
 
         try {
-            // ¡Llama a la API del SERVIDOR con el objeto de apuestas!
+            //Llama a la API del SERVIDOR
             const response = await fetch('/api/girar', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ bets: currentBets }), // Envía el objeto de apuestas
-                credentials: 'include' // Envía la cookie de autenticación
+                credentials: 'include' // Envía la cookie
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                // Si falla (ej: fondos insuficientes), mostrar error y no girar
                 throw new Error(data.message || "Error al girar");
             }
 
             const { winningNumber, nuevoSaldo, gananciaNeta } = data;
 
-            // El servidor aprobó la apuesta, ahora animamos la ruleta
             spinTo(winningNumber, () => {
-                // Esta función se ejecuta CUANDO LA ANIMACIÓN TERMINA
                 
-                // 1. Actualizar saldo y limpiar apuestas
+                // Actualizar saldo y limpiar apuestas
                 if (saldoEl) {
                     saldoEl.textContent = `$${nuevoSaldo}`;
                 }
                 currentBets = {}; // Limpiar apuestas
-                updateBetsUI(); // Actualizar UI (pone el total a $0)
+                updateBetsUI(); // Deja el saldo en 0
                 
-                // 2. Mostrar mensaje de ganancia/pérdida
+                // Mostrar mensaje de ganancia/pérdida
                 showStatus(gananciaNeta > 0 ? `¡Ganaste $${gananciaNeta}!` : "No ganaste esta ronda.");
-                showResult(winningNumber); // Muestra el chip del número
+                showResult(winningNumber); 
 
-                // 3. Actualizar historial de números
                 winningNumbersHistory.push(winningNumber);
                 if (winningNumbersHistory.length > MAX_HISTORY) {
                     winningNumbersHistory.shift();
                 }
                 updateWinningNumbersUI();
 
-                // 4. Habilitar controles para la próxima ronda
                 setControlsEnabled(true);
             });
 
         } catch (error) {
             console.error("Error en handleSpin:", error);
             showStatus(error.message, true);
-            setControlsEnabled(true); // Re-habilitar si la API falla
+            setControlsEnabled(true);
         }
     }
 
-    // Función de animación (Se mantiene la de la última corrección)
     function spinTo(winningNumber, onAnimationEndCallback){
         if (!wheel) return;
         const targetIdx = numbersCW.indexOf(winningNumber);
@@ -356,9 +337,8 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
         wheel.addEventListener('transitionend', onEnd);
     }
 
-    // --- Inicialización ---
+    //Inicialización
     function init() {
-        // Comprobación de elementos críticos al inicio
         if (!wheel || !spinBtn || !statusEl || !numberGrid || !bettingTable || !chipSelector) {
             console.error("Faltan elementos críticos de la ruleta en el DOM. El script no puede inicializarse.");
             console.log("Falta 'wheel':", wheel);
@@ -370,13 +350,12 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
             return; // Detiene la ejecución si falta algo
         }
         
-        createNumberGrid(); // Dibuja el tapete 1-36
-        paintWheel(); // Dibuja el fondo de la ruleta
-        drawLabels(); // Dibuja los números en la ruleta
+        createNumberGrid(); // tapete
+        paintWheel(); // fondo de la ruleta
+        drawLabels(); // numeros en la ruleta
         showStatus('Haz tu apuesta y gira');
         spinBtn.disabled = true;
         
-        // Asigna los eventos
         window.addEventListener('resize', drawLabels);
         chipSelector.addEventListener('click', selectChip);
         bettingTable.addEventListener('click', placeBet);
@@ -388,4 +367,4 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
 
     init(); // Iniciar la aplicación
 
-}; // <-- Fin del wrapper 'window.onload'
+};

@@ -1,26 +1,24 @@
 const mongoose = require('mongoose');
 
 const TransaccionSchema = new mongoose.Schema({
-  // CAMPO CRÍTICO: Debe ser 'user' para coincidir con `req.user` y las consultas en ruleta.js
-  user: { 
+    user: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: 'User',
     required: true
 },
-  // Tipos: depósito, retiro, o apuesta. 'apuesta' es el tipo que usa la ruleta.
-  tipo: { 
+
+ tipo: { 
     type: String, 
     enum: ['deposito', 'retiro', 'apuesta'], 
     required: true 
 },
-  // Cantidad de dinero movida
-  monto: { 
+ // Cantidad de dinero movida
+ monto: { 
     type: Number, 
     required: true, 
     min: 0 
 },
-  // El número específico al que se apostó (solo si tipo es 'apuesta')
-  numero: { 
+    numero: { 
     type: Number, 
     min: 0, 
     max: 36, 

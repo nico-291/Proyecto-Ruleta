@@ -10,6 +10,7 @@ window.onload = () => {
     const chipSelector = document.getElementById('chip-selector');
     const bettingTable = document.querySelector('.betting-table');
     const numberGrid = document.querySelector('.number-grid');
+    const gananciaPotencialEl = document.getElementById('ganancia-potencial');
 
     const numbersCW = [
         0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10,
@@ -17,6 +18,12 @@ window.onload = () => {
     ];
     const redSet = new Set([1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]);
     const blackSet = new Set([2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]);
+    const PAYOUTS = {
+        'number': 35,
+        'dozen': 2,
+        'column': 2,
+        'outside': 1 
+    };
     const isRed = n => redSet.has(n);
     const isGreen = n => n === 0;
     const getColor = n => isGreen(n) ? 'green' : (isRed(n) ? 'red' : 'black');
@@ -123,9 +130,9 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
     spinBtn.disabled = false; // Activa el botón de girar
 
     console.log(`Apuesta de ${chipValue} en ${betKey}. Total en esta celda: ${currentBets[betKey]}`);
+    updateGananciaPotencial();
 }
 
-    // Limpiar todas las apuestas
     function clearBets() {
         if (spinning) return;
         currentBets = {};
@@ -133,8 +140,32 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
         showStatus('Apuestas limpiadas. Haz tu próxima apuesta.');
     }
 
+    function updateGananciaPotencial(){
+    if (!gananciaPotencialEl) return; 
+
+    let gananciaTotal = 0;
+
+    for (const betKey in currentBets) {
+        const amount = currentBets[betKey];
+        const betType = betKey.split('-')[0];
+
+        let payout = 0;
+        
+        if (betType === 'number') {
+            payout = PAYOUTS.number;
+        } else if (betType === 'dozen' || betType === 'column') {
+            payout = PAYOUTS.dozen;
+        } else if (betType === 'outside') {
+            payout = PAYOUTS.outside;
+        }
+        gananciaTotal += (amount * payout);
+    }
+
+
+    gananciaPotencialEl.textContent = `$${gananciaTotal}`;
+}
+
   function updateBetsUI() {
-    
     //Limpia todas las fichas visuales
     if (bettingTable) {
         bettingTable.querySelectorAll('.chip-on-board').forEach(chip => chip.remove());
@@ -149,6 +180,7 @@ console.log(`Ficha seleccionada: ${currentChipValue}`);
     if (spinBtn) {
         spinBtn.disabled = (totalBetAmount === 0) || spinning;
     }
+    updateGananciaPotencial();
 }
 
     function paintWheel() {

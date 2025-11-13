@@ -1,66 +1,73 @@
-<div class="roulette-game-container">
-  <header class="text-center mb-30">
-    <h1 class="roulette-title">Mesa de Ruleta Europea</h1>
-    <div class="game-status betting">
-      <div>Estado: <strong>Recibiendo Apuestas</strong></div>
-    </div>
-  </header>
-
-  <div class="metrics-grid mb-20">
+<div class="metrics-grid mb-20">
+  <div class="metric-card">
+    <h2>Saldo Disponible</h2>
+    <div id="saldo-actual" class="metric-value">${{user.saldo}}</div>
+  </div>
     <div class="metric-card">
-      <h2>Saldo Disponible</h2>
-      <div id="saldo-actual" class="metric-value">${{user.saldo}}</div>
+    <h3>Apuesta Total</h3>
+    <div id="apuesta-actual" class="metric-value">$0</div>
     </div>
-    <div class="metric-card">
-      <h3>Apuesta Total</h3>
-      <div id="apuesta-actual" class="metric-value">$0</div>
-    </div>
-    <div class="metric-card">
-      <h3>Ganancia Potencial</h3>
-      <div id="ganancia-potencial" class="metric-value">$0</div>
-    </div>
+      <div class="metric-card">
+       <h3>Ganancia Potencial</h3>
+       <div id="ganancia-potencial" class="metric-value">$0</div>
+      </div>
   </div>
 
+<div class="card text-center mb-20">
+  <h2>Selecciona tu Ficha</h2>
+  <div id="chip-selector" class="chip-selector">
+   <button class="chip-btn selected" data-value="1">1</button>
+   <button class="chip-btn" data-value="5">5</button>
+   <button class="chip-btn" data-value="25">25</button>
+   <button class="chip-btn" data-value="100">100</button>
+  </div>
+</div>
+
+<div class="roulette-layout">        
+  <div class="roulette-wheel-area card">
   <div class="roulette-wrap">
-    <div class="pointer" aria-hidden="true"></div>
-    <div id="wheel" class="wheel" role="img" aria-label="Ruleta europea"></div>
-  </div>
-
-  <div class="roulette-controls">
-    <input type="number" id="numeroInput" placeholder="Número (0-36)" />
-    <input type="number" id="montoInput" placeholder="Monto $" />
-    <button id="apostarBtn">Apostar</button>
-    
-    <button id="spinBtn" class="spin-btn">GIRAR RULETA</button>
+  <div class="pointer" aria-hidden="true"></div>
+  <div id="wheel" class="wheel" role="img" aria-label="Ruleta europea"></div>
+  </div>        
+    <div class="roulette-controls mt-20">
+      <button id="spinBtn" class="spin-btn" disabled>GIRAR RULETA</button>
+      <button id="clearBetsBtn">Limpiar Apuestas</button>
+    </div>
+            
     <div id="status" class="roulette-status" aria-live="polite">
       Haz tu apuesta para comenzar
     </div>
-  </div>
 
-  <div class="last-numbers">
+  <div class="last-numbers mt-20">
     <h3>Últimos Números Ganadores</h3>
-    <ul id="winning-numbers-list" class="winning-numbers-ui">
-    </ul>
+    <ul id="winning-numbers-list" class="winning-numbers-ui"></ul>
+  </div>
   </div>
 
-  <div class="last-numbers">
-    <h3>Mis Últimas Apuestas (Historial)</h3>
-    <ul>
-      {{#each apuestas}}
-        <li>Número: {{this.numero}} — Monto: ${{this.monto}} — Fecha: {{this.fecha}}</li>
-      {{else}}
-        <li>No has realizado apuestas.</li>
-      {{/each}}
-    </ul>
+<div class="betting-table-container">
+  <div class="betting-table">
+  <div class="zero-bet">
+  <div class="bet-cell zero" data-bet-type="number" data-bet-value="0">0</div>
   </div>
-
-  <section class="card text-center mt-30">
-    <h2>Controles de Juego</h2>
-    <div class="controls-grid">
-      <a href="/perfil" class="bn-login">Volver al Perfil</a>
-      <a href="/transacciones" class="bn-register">Hacer Transacción</a>
-    </div>
-  </section>
+  
+<div class="number-grid-container">
+  <div class="number-grid"></div>
+  <div class="dozen-bets">
+  <div class="bet-cell outside" data-bet-type="dozen" data-bet-value="1">1st 12</div>
+  <div class="bet-cell outside" data-bet-type="dozen" data-bet-value="2">2nd 12</div>
+  <div class="bet-cell outside" data-bet-type="dozen" data-bet-value="3">3rd 12</div>
+  </div>
+<div class="outside-bets">
+  <div class="bet-cell outside" data-bet-type="outside" data-bet-value="1-18">1-18</div>
+  <div class="bet-cell outside" data-bet-type="outside" data-bet-value="even">PAR</div>
+  <div class="bet-cell outside red" data-bet-type="outside" data-bet-value="red">♦</div>
+  <div class="bet-cell outside black" data-bet-type="outside" data-bet-value="black">♦</div>
+  <div class="bet-cell outside" data-bet-type="outside" data-bet-value="odd">IMPAR</div>
+  <div class="bet-cell outside" data-bet-type="outside" data-bet-value="19-36">19-36</div>
 </div>
+</div>
+   </div>
+</div>
+  </div>
 
-<script src="/ruleta.js"></script>
+<script src="/ruleta.js" defer></script>

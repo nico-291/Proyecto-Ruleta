@@ -41,7 +41,7 @@ body {
         max-width: 1200px;
         padding: 1.25rem;
     }
- }       
+ }        
     /*navbar*/
    .navbar {
             background-color: rgba(0, 0, 0, 0.8);
@@ -180,7 +180,7 @@ body {
             background-color: transparent;
             color: #c79b3b;
             border: 2px solid #c79b3b;
-        }    
+        }       
         .rules-btn {
             background-color: transparent;
             color: #c79b3b;
@@ -188,7 +188,7 @@ body {
         }
         
         .rules-btn:hover {
-              background-color: rgba(199, 155, 59, 0.1);
+             background-color: rgba(199, 155, 59, 0.1);
             transform: translateY(-3px);
            
         }
@@ -420,7 +420,7 @@ header h1{
    align-items: center;
    padding: 3rem;
 }
-/*Ruleta*/
+/*Ruleta (Genérico, aplica a todas las páginas de ruleta)*/
 .container{
         max-width: 1200px;
     margin: 0 auto;
@@ -488,7 +488,7 @@ h3 {
     border-radius: var(--card-radius);
     padding: clamp(1rem, 2vw, 1.5rem);
     text-align: center;
-    margin: 2rem 0;
+    /* margin: 2rem 0; - Quitado para que quepa en la tarjeta de la ruleta */
 }
 .controls-grid{
     display: flex;
@@ -536,7 +536,8 @@ h3 {
     margin: 0 auto;
 }
 
-/* css ruleta */
+/* --- INICIO: CSS COMPLETO Y UNIFICADO DE LA RULETA --- */
+/* (Esto reemplaza todas las reglas viejas y duplicadas) */
 
 .roulette-game-container h1.roulette-title {
     color: var(--primary-gold);
@@ -545,16 +546,105 @@ h3 {
     margin-bottom: 1.5rem;
 }
 
+/* --- 1. Layout Principal y Fichas --- */
+
+.roulette-layout {
+  display: grid;
+  grid-template-columns: 4fr 5fr; /* Columna para la ruleta, columna para el tapete */
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+  .roulette-layout {
+    grid-template-columns: 1fr; /* Apila la ruleta encima del tapete */
+  }
+}
+
+.chip-selector {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.chip-on-board {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px; 
+    height: 30px;
+    border-radius: 50%; /* La hace redonda */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--black);
+    border: 2px solid rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    
+    /* z-index es para que se ponga por encima del texto del número */
+    z-index: 10;
+}
+.chip-on-board.chip-1 { 
+    background-color: #d92b2f;
+    color: white;
+}
+.chip-on-board.chip-5 { 
+    background-color: #298ee4;
+    color: white; 
+}
+.chip-on-board.chip-25 { 
+    background-color: #298e40;
+    color: white; 
+}
+.chip-on-board.chip-100 { 
+    background-color: #0f0f0f;
+    color: white; 
+    border-color: #888;
+}
+
+.chip-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.chip-btn.selected {
+  transform: scale(1.15);
+  box-shadow: 0 0 15px var(--secondary-gold);
+  border-color: var(--secondary-gold);
+}
+
+.chip-btn[data-value="1"] { background-color: #d92b2f; color: white; }
+.chip-btn[data-value="5"] { background-color: #298ee4; color: white; }
+.chip-btn[data-value="25"] { background-color: #298e40; color: white; }
+.chip-btn[data-value="100"] { background-color: #0f0f0f; color: white; border-color: #888; }
+
+/* --- 2. La Rueda de la Ruleta (Wheel) --- */
 
 .roulette-wrap {
     position: relative;
-    width: 90vw; 
+    /* CORREGIDO: Ocupa el 100% de su columna, no 90vw */
+    width: 100%; 
     max-width: 500px; 
     aspect-ratio: 1 / 1; 
-    margin: 2rem auto; 
+    /* CORREGIDO: Se centra dentro de su columna de grid */
+    margin: 0 auto; 
 }
 
-/* puntero*/
 .pointer {
     position: absolute;
     top: -5px; 
@@ -569,19 +659,15 @@ h3 {
     filter: drop-shadow(0 -2px 2px rgba(0,0,0,0.5));
 }
 
-/* girar */
 .wheel {
     width: 100%;
     height: 100%;
     border-radius: 50%; 
     border: 10px solid var(--primary-gold); 
     box-shadow: 0 0 20px rgba(0,0,0,0.5), inset 0 0 15px rgba(0,0,0,0.4);
-    
     background-color: var(--dark-bg); 
     background-image: conic-gradient(red 0deg 9.7deg, black 9.7deg 19.4deg); /* Fondo de reserva */
-    
     position: relative;
-    
     transition: transform 0.5s ease-out;
 }
 
@@ -590,7 +676,6 @@ h3 {
     top: 0; left: 0; right: 0; bottom: 0;
 }
 
-/* Estilo número (0-36) */
 .label {
     position: absolute;
     top: 50%;
@@ -603,6 +688,7 @@ h3 {
     width: 30px; 
     height: 15px;
     line-height: 15px; 
+    /* El JS se encarga del 'transform' para la posición y rotación */
 }
 .label.green {
     color: var(--green); 
@@ -610,37 +696,137 @@ h3 {
 .label.win {
     color: var(--secondary-gold);
     text-shadow: 0 0 10px var(--secondary-gold);
+    /* Se aplica !important para sobreescribir el transform del JS temporalmente */
     transform: translate(-50%, -50%) scale(1.5) !important; 
     transition: all 0.3s ease;
 }
 
+/* --- 3. El Tapete de Apuestas (Table) --- */
 
-/*Controles y Resultados*/
+.betting-table-container {
+  flex: 2;
+  padding: 1rem;
+  background: var(--dark-bg);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow-x: auto;
+  min-width: 0;
+}
 
+.betting-table {
+    display: flex;
+    flex-direction: row;
+    min-width: 800px; /* Ancho mínimo para que el tablero se vea bien */
+    padding: 5px;
+    background-color: #0a481c; 
+    border-radius: 10px;
+    border: 3px solid var(--primary-gold);
+}
+
+.zero-bet {
+    flex: 0 0 50px; 
+    display: flex;
+    align-items: stretch; 
+    padding: 2px;
+}
+
+
+.number-grid-container {
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
+}
+
+.number-grid {
+    display: grid;
+    /* Crea 12 columnas, cada una de 1 fracción */
+    grid-template-columns: repeat(12, 1fr);
+    gap: 2px; /* Espacio entre las celdas */
+}
+/* Contenedor de las Docenas (1st 12, 2nd 12, 3rd 12) */
+.dozen-bets {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 2px;
+    margin-top: 2px;
+}
+/*Contenedor de las apuestas externas (Par, Impar, Rojo, etc.) */
+.outside-bets{
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+    margin-top: 2px;
+}
+/*Estilos generales de TODAS las celdas de apuesta */
+.bet-cell{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 0.5rem;
+    font-weight: bold;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+}
+
+.bet-cell:hover {
+  background-color: var(--secondary-gold);
+  color: var(--black);
+}
+
+.bet-cell.red { background-color: var(--red); }
+.bet-cell.black { background-color: var(--black); }
+
+.bet-cell.outside {
+  font-size: 0.9rem;
+  aspect-ratio: 2 / 1; /* Celdas más anchas */
+  text-transform: uppercase;
+}
+
+.bet-cell.outside.red { font-size: 1.5rem; }
+.bet-cell.outside.black { font-size: 1.5rem; }
+
+.bet-chip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background-color: var(--secondary-gold);
+  color: #333;
+  font-size: 0.8rem;
+  font-weight: 900;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  pointer-events: none; 
+  opacity: 0.9;
+}
+
+/* --- 4. Controles, Status y Resultados --- */
+
+/* Contenedor para botones 'Girar' y 'Limpiar' */
 .roulette-controls {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    padding: 1.5rem;
-    background: var(--dark-bg);
-    border: var(--card-border);
-    border-radius: var(--card-radius);
-    max-width: 800px;
-    margin: 1rem auto;
+    padding: 1rem; 
+    max-width: 100%;
+    margin: 1rem auto 0 auto;
 }
 
-.roulette-controls input[type="number"] {
-    padding: 0.8rem;
-    border: 1px solid var(--primary-gold);
-    border-radius: 8px;
-    background: #fff;
-    color: #0e0707;
-    font-size: 1rem;
-    width: 150px;
-}
-
+/* Botones dentro de .roulette-controls */
 .roulette-controls button {
     padding: 0.8rem 1.5rem;
     border: 2px solid var(--primary-gold);
@@ -670,13 +856,14 @@ h3 {
     background-color: var(--secondary-gold);
 }
 
+/* Mensaje de estado (ej: "Girando...") */
 .roulette-status {
     width: 100%;
     text-align: center;
     margin-top: 1rem;
 }
 
-/*resultado (ej: "15 - ROJO") */
+/* Chip de resultado (ej: "15 - ROJO") */
 .result-chip {
     display: inline-flex;
     align-items: center;
@@ -694,7 +881,7 @@ h3 {
     color: var(--red);
 }
 
-/* El puntito de color en el lista */
+/* El punto de color en la lista */
 .result-dot {
     width: 18px;
     height: 18px;
@@ -726,3 +913,13 @@ h3 {
     color: white;
     font-size: 1rem;
 }
+
+.bet-cell:hover {
+    background-color: var(--secondary-gold);
+    color: var(--black);
+}
+
+/*Colores específicos para las celdas */
+.bet-cell.zero { background-color: var(--green); }
+
+/* --- FIN: CSS COMPLETO DE LA RULETA --- */

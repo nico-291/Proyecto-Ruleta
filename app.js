@@ -2,50 +2,37 @@ const express = require('express');
 const exphbs = require('express-handlebars');
 const path = require('path');
 const cookieParser = require('cookie-parser'); 
-const mongoose = require('mongoose');
 const cors = require('cors');
-
 require('dotenv').config(); 
 
 const connectDB = require('./config/db');
-
 const User = require('./models/User');
-const Transaccion = require('./models/Transaccion');
-const authRoutes = require('./routes/auth');
-const ruletaRoutes = require('./routes/ruleta');
-const transaccionRoutes = require('./routes/transacciones');
-connectDB();
+
+// Inicializar Express y conectar DB
 const app = express();
+connectDB(); // Solo llamamos a este, borramos el mongoose.connect redundante
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Conectado a MongoDB Atlas'))
-  .catch(err => console.error('Error al conectar a MongoDB:', err));
-
+// Configuración de Handlebars
 app.engine('hbs', exphbs.engine({
     extname: 'hbs',
     defaultLayout: 'main',
     layoutsDir: path.join(__dirname, 'views/layouts'),
     partialsDir: path.join(__dirname, 'views/partials'),
     helpers: {
-      eq: function (a, b) {
-        return a === b;
-      },
+        eq: function (a, b) { return a === b; }
     }
 }));
-
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 
+// Middlewares Globales
 app.use(express.static('public')); 
 app.use(express.urlencoded({extended:true}));
-app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:80', 
-  credentials: true 
-}));
+app.use(express.json()); // Importante para la API
 app.use(cookieParser());
+app.use(cors());
 
-
+// Middleware de Autenticación (Carga usuario si existe cookie)
 app.use(async (req, res, next) => {
   const userId = req.cookies.userId; 
   if (userId) {
@@ -55,75 +42,39 @@ app.use(async (req, res, next) => {
         req.user = user;
         res.locals.user = user; 
       }
-    }catch(error){
-      console.error('Error cargando usuario de cookie:', error);
+    } catch(error){
+      console.error('Error cookie:', error);
     }
   }
   next();
 });
 
+// Función para proteger rutas
 const ensureAuth = (req, res, next) => {
-  if (req.user) {
-    return next(); 
+  if (req.user) return next(); 
+  
+  // Si pide API y no está logueado -> Error 401 JSON
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(401).json({ success: false, message: 'No autenticado' });
   }
-  if (req.path.startsWith('/api/')) {
-    return res.status(401).json({ message: 'No estás autenticado.' });
-  }
-
+  // Si pide vista -> Redirigir login
   res.redirect('/login');
 };
- 
 
-app.get('/', (req, res) => res.render('index'));
-app.get('/login', (req, res) => res.render('login'));
-app.get('/register', (req, res) => res.render('register'));
-app.get('/rules', (req, res) => res.render('rules'));
-app.get('/info', (req, res) => res.render('info'));
+// --- RUTAS ---
 
-app.use('/', authRoutes);
+// 1. Rutas de API (Devuelven JSON)
+app.use('/api', require('./routes/auth'));        // Login/Registro API
+app.use('/api', ensureAuth, require('./routes/ruleta')); // Ruleta API
+app.use('/api', ensureAuth, require('./routes/transacciones')); // Transacciones API
 
-app.use('/api', ensureAuth, ruletaRoutes);
-app.use('/', ensureAuth, transaccionRoutes); 
+// 2. Rutas de Vistas (Renderizan HTML)
+// Las movemos a un archivo separado para no ensuciar app.js, 
+// o las dejamos aquí simplificadas:
+app.use('/', require('./routes/views')); 
 
-app.get('/perfil', ensureAuth, async (req, res) => {
-  try {
-    const transacciones = await Transaccion.find({ user: req.user._id })
-      .limit(5)
-      .sort('-fecha')
-      .lean();
-    res.render('perfil', { transacciones });
-  } catch (error) {
-    console.error(error);
-    res.redirect('/');
-  }
-});
-
-app.get('/mesa-ruleta', ensureAuth, async (req, res) => {
-  try {
-    const apuestas = await Transaccion.find({ user: req.user._id, tipo: 'apuesta' })
-      .limit(10)
-      .sort('-fecha')
-      .lean();
-    res.render('mesa-ruleta', { apuestas });
-  } catch (error) {
-    console.error(error);
-    res.redirect('/perfil');
-  }
-});
-
-app.get('/transacciones', ensureAuth, async (req, res) => {
-  try {
-    const transacciones = await Transaccion.find({ user: req.user._id })
-      .sort('-fecha')
-      .lean();
-    res.render('transacciones', { transacciones });
-  } catch (error) {
-    console.error(error);
-    res.redirect('/perfil');
-  }
-});
-
+// Puerto
 const PORT = process.env.PORT || 80;
 app.listen(PORT, ()=> {
-    console.log(`Servidor en http://localhost:${PORT}`);
+    console.log(`Servidor listo en http://localhost:${PORT}`);
 });

@@ -2,107 +2,174 @@
     <header>
       <h1>Gestión de Transacciones</h1>
     </header>
+    
     <main class="rules-card">
         <section class="card text-center saldo-container">
             <h2>Saldo Actual</h2>
             <div class="Saldo">${{user.saldo}}</div>
             <p>Saldo Virtual Disponible</p>
         </section>
-      {{#if error}}
-          <div class="alert error">{{error}}</div>
-      {{/if}}
 
-      {{#if success}}
-      <div class="alert success">{{success}}</div>
-      {{/if}}
-  <div class="grid grid-2">
-    <section class="card">
-      <h2>Depositar fichas</h2>
-      <p>Añade Fichas Virtuales</p>
-  <form action="/deposit" method="POST">
-    <div class="grupo-form">
-      <label for="monto-deposito">Cantidad a Depositar</label>
-      <input type="number" id="monto-deposito" name="monto" placeholder="Ingresa Cantidad" required>
-    </div>
-    <div class="grupo-form">
-      <label for="metodo-deposito">Método de Depósito</label>
-      <select name="metodo-deposito" id="metodo-deposito">
-      <option value="paypal">Paypal</option>
-      <option value="tarjeta">Tarjeta de Débito/Crédito</option>
-      <option value="criptomonedas">Criptomonedas</option>
-      </select>
-    </div>
+        {{#if error}}
+            <div class="alert error">{{error}}</div>
+        {{/if}}
 
-    <div class="text-center">
-      <button type="submit" class="bn-login">Depositar</button>
-    </div>
-    </form>
-    </section>
-    <section class="card">
-      <h2>Retirar Fichas</h2>
-      <p>Retira tus ganancias</p>
-    <form action="/withdraw" method="POST">
-      <div class="grupo-form">
-        <label for="retiro-monto">Cantidad a Retirar</label>
-        <input type="number" id="retiro-monto" name="monto" placeholder="Ingresa Cantidad" min="1" required>
-      </div>
+        {{#if success}}
+            <div class="alert success">{{success}}</div>
+        {{/if}}
 
-      <div class="grupo-form">
-        <label for="metodo-retiro">Método de Retiro</label>
-        <select name="metodo-retiro" id="metodo-retiro">
-          <option value="paypal">Paypal</option>
-          <option value="tarjeta">Tarjeta de Débito/Crédito</option>
-          <option value="criptomonedas">Criptomonedas</option>
-        </select>
-      </div>
+        <div class="grid grid-2">
+            <section class="card">
+                <h2>Depositar fichas</h2>
+                <p>Añade Fichas Virtuales</p>
+                <form id="formDeposito" action="/api/deposit" method="POST">
+                    <div class="grupo-form">
+                        <label for="monto-deposito">Cantidad a Depositar</label>
+                        <input type="number" id="monto-deposito" name="monto" placeholder="Ingresa Cantidad" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="metodo-deposito">Método de Depósito</label>
+                        <select name="metodo-deposito" id="metodo-deposito">
+                            <option value="paypal">Paypal</option>
+                            <option value="tarjeta">Tarjeta de Débito/Crédito</option>
+                            <option value="criptomonedas">Criptomonedas</option>
+                        </select>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="bn-login">Depositar</button>
+                    </div>
+                </form>
+            </section>
 
-      <div class="grupo-form">
-        <label for="cuenta-destino">Cuenta de Destino</label>
-        <input type="text" id="cuenta-destino" name="cuenta-destino" placeholder="Número de Cuenta" required>
-      </div>
+            <section class="card">
+                <h2>Retirar Fichas</h2>
+                <p>Retira tus ganancias</p>
+                <form id="formRetiro" action="/api/withdraw" method="POST">
+                    <div class="grupo-form">
+                        <label for="retiro-monto">Cantidad a Retirar</label>
+                        <input type="number" id="retiro-monto" name="monto" placeholder="Ingresa Cantidad" min="1" required>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="metodo-retiro">Método de Retiro</label>
+                        <select name="metodo-retiro" id="metodo-retiro">
+                            <option value="paypal">Paypal</option>
+                            <option value="tarjeta">Tarjeta de Débito/Crédito</option>
+                            <option value="criptomonedas">Criptomonedas</option>
+                        </select>
+                    </div>
+                    <div class="grupo-form">
+                        <label for="cuenta-destino">Cuenta de Destino</label>
+                        <input type="text" id="cuenta-destino" name="cuenta-destino" placeholder="Número de Cuenta" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="bn-login">Solicitar Retiro</button>
+                    </div>
+                </form>
+            </section>
+        </div>
 
-      <div class="text-center">
-        <button type="submit" class="bn-login">Solicitar Retiro</button>
-      </div>
-    </form>
-      </section>
-      </div>
+        <section class="rules-card profile-transactions" style="margin-top: 2rem;">
+            <h2>Historial de Transacciones</h2>
+            <ul class="transaction-list">
+                {{#each transacciones}}
+                <li class="item-transaction">
+                    <div>
+                        {{#if (eq tipo "apuesta")}}
+                            <div class="tipo-transaccion">
+                                Apuesta Ruleta ({{status}})
+                            </div>
+                        {{else}}
+                            <div class="tipo-transaccion" style="text-transform: capitalize;">
+                                {{tipo}}
+                            </div>
+                        {{/if}}
+                        
+                        <div class="transaction-date">{{this.fecha}}</div>
+                    </div>
 
-  <section class="rules-card profile-transactions" style="margin-top: 2rem;">
-    <h2>Historial de Transacciones</h2>
-    <ul class="transaction-list">
-      {{#each transacciones}}
-      <li class="item-transaction">
-    <div>
-      {{#if (eq tipo "bet")}}
-      <div class="tipo-transaccion">
-        Apuesta Ruleta ({{status}})
-      </div>
-      {{else}}
+                    {{#if (eq tipo "apuesta")}}
+                        {{#if (eq status "win")}}
+                            <div class="transaction-positive">+${{ganancia}}</div>
+                        {{else}}
+                            <div class="transaction-negative">-${{monto}}</div>
+                        {{/if}}
+                    
+                    {{else if (eq tipo "deposito")}}
+                        <div class="transaction-positive">+${{monto}}</div>
 
-    <div class="tipo-transaccion" style="text-transform: capitalize;">{{tipo}}</div>
-      {{/if}}
-    <div class="transaction-date">{{this.fecha}}</div>
-    </div>
-
-      {{#if (eq tipo "bet")}}
-      {{#if (eq status "win")}}
-    <div class="transaction-positive">+${{ganancia}}</div>
-      {{else}}
-    <div class="transaction-negative">-${{monto}}</div>
-      {{/if}}
-      {{else if (eq tipo "deposit")}}
-    <div class="transaction-positive">+${{monto}}</div>
-      {{else}}
-    <div class="transaction-negative">-${{monto}}</div>
-      {{/if}}
-    </li>
-      {{else}}
-        <li class="item-transaction">
-          <p>No has realizado ninguna transacción.</p>
-        </li>
-          {{/each}}
-          </ul>
+                    {{else if (eq tipo "retiro")}}
+                         <div class="transaction-negative">-${{monto}}</div>
+                    
+                    {{else}}
+                         <div class="transaction-negative">-${{monto}}</div>
+                    {{/if}}
+                </li>
+                {{else}}
+                    <li class="item-transaction">
+                        <p>No has realizado ninguna transacción.</p>
+                    </li>
+                {{/each}}
+            </ul>
         </section>
     </main>
 </div>
+
+<script>
+    // --- LÓGICA DE DEPÓSITO ---
+    const formDeposito = document.getElementById('formDeposito');
+    if (formDeposito) {
+        formDeposito.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const formData = Object.fromEntries(new FormData(e.target));
+
+            try {
+                const res = await fetch('/api/deposit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    alert(data.mensaje || 'Depósito exitoso');
+                    window.location.reload(); 
+                } else {
+                    alert(data.error || 'Error al depositar');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error de conexión');
+            }
+        });
+    }
+
+    // --- LÓGICA DE RETIRO ---
+    const formRetiro = document.getElementById('formRetiro');
+    if (formRetiro) {
+        formRetiro.addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            const formData = Object.fromEntries(new FormData(e.target));
+
+            try {
+                const res = await fetch('/api/withdraw', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    alert(data.mensaje || 'Retiro solicitado');
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Error al retirar');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Error de conexión');
+            }
+        });
+    }
+</script>

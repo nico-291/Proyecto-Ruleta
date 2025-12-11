@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const Transaccion = require('../models/Transaccion');
-
-// Middleware simple para verificar auth en vistas
 const ensureAuthView = (req, res, next) => {
   if (req.user) return next();
   res.redirect('/login');
@@ -22,7 +20,7 @@ router.get('/perfil', ensureAuthView, async (req, res) => {
 });
 
 router.get('/mesa-ruleta', ensureAuthView, async (req, res) => {
-  res.render('mesa-ruleta'); // La ruleta carga datos via JS/Fetch
+  res.render('mesa-ruleta');
 });
 
 router.get('/transacciones', ensureAuthView, async (req, res) => {

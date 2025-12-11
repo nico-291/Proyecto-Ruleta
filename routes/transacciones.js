@@ -3,7 +3,6 @@ const router = express.Router();
 const User = require('../models/User');
 const Transaccion = require('../models/Transaccion');
 
-// POST /api/deposit
 router.post('/deposit', async (req, res) => {
   const { monto } = req.body;
   const montoNum = parseFloat(monto);
@@ -25,7 +24,6 @@ router.post('/deposit', async (req, res) => {
   }
 });
 
-// POST /api/withdraw
 router.post('/withdraw', async (req, res) => {
   const { monto } = req.body;
   const montoNum = parseFloat(monto);
